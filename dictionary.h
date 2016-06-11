@@ -19,7 +19,7 @@ typedef struct _template_dictionary {
     unsigned int length;
 } template_dictionary;
 
-char *td_fetch_val(const template_dictionary *in, const char *lookup);
+const char *td_fetch_val(const template_dictionary *in, const char *lookup);
 template_dictionary *td_new();
 void td_clean(template_dictionary *in);
 void td_put_val(template_dictionary *in, const char *key, const char *value);

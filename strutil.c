@@ -89,3 +89,27 @@ char *strutil_next_token(const char *in, const char *token) {
     // nothing was found that matched
     return NULL;
 }
+
+/*
+removes all unicode characters
+
+returns number of unicode characters removed, and stores output into the char out
+will allocate memory for it
+*/
+unsigned int strutil_remove_unicode(const uint8_t *in, const size_t length, char *out) {
+    unsigned int i;
+    unsigned int removeCount = 0;
+    char *guess = malloc(sizeof(char) * length);
+    
+    for (i = 0; i < length; i++) {
+        if (in[i] > 127) {
+            removeCount++;
+        } else {
+            guess[i-removeCount] = in[i] % 128;
+        }
+    }
+    
+    out = strndup(guess, length-removeCount);
+    free(guess);
+    return removeCount;
+}

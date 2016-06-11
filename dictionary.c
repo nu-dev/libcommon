@@ -1,6 +1,6 @@
 #include "dictionary.h"
 
-char *td_fetch_val(const template_dictionary *in, const char *lookup) {
+const char *td_fetch_val(const template_dictionary *in, const char *lookup) {
     // get the first entry
     template_dictionary_entry *curr = in->entryList;
     
@@ -111,9 +111,6 @@ template_dictionary *td_merge(template_dictionary *in, template_dictionary *in2)
         currcopy->next = curr;
         ret->length++;
     }
-    
-    free(in);
-    free(in2);
     
     ret->entryListTail = currcopy;
     return ret;
