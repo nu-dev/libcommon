@@ -8,7 +8,7 @@
 #include "dictionary.h"
 #include "strutil.h"
 
-// color codes
+/* color codes */
 #ifndef _NU_COLORS
     #define _NU_COLORS
     #ifdef __linux__

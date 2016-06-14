@@ -44,19 +44,19 @@ char *strutil_trim_spaces(const char *in) {
     const char *startLocation;
     int length = 0;
     
-    // loop until the character is no longer a space
+    /* loop until the character is no longer a space */
     while (*in == ' ') in++;
     
-    // save the current location
+    /* save the current location */
     startLocation = in;
     
-    // Loop until the character is a space or null (ie, string ended)
+    /* Loop until the character is a space or null (ie, string ended) */
     while (*in != ' ' && *in != '\0') {
         length++;
         in++;
     }
     
-    // return the newly allocated string
+    /* return the newly allocated string */
     return strndup(startLocation, length);
 }
 
@@ -68,25 +68,25 @@ char *strutil_next_token(const char *in, const char *token) {
     const char *currChar = in;
     int i;
     int tokenLen = strlen(token);
-    // loop through the entire string
+    /* loop through the entire string */
     while (*currChar != '\0') {
-        // check if currChar matches the first token
+        /* check if currChar matches the first token */
         if (*currChar == *token) {
-            // loop through for the rest of the token lengths to see if they are equal
+            /* loop through for the rest of the token lengths to see if they are equal */
             for (i = 1; i < tokenLen; i++) {
                 if (currChar[i] != token[i]) {
-                    // the match failed at some point, keep looping through string then.
+                    /* the match failed at some point, keep looping through string then. */
                     goto noMatch;
                 }
             }
-            // the loop finished successfully (ie, everything matches), so return
+            /* the loop finished successfully (ie, everything matches), so return */
             return (char *)currChar;
         }
-        // keep looping through string
+        /* keep looping through string */
         noMatch:
         currChar++;
     }
-    // nothing was found that matched
+    /* nothing was found that matched */
     return NULL;
 }
 
@@ -96,7 +96,7 @@ removes all unicode characters
 returns number of unicode characters removed, and stores output into the char out
 will allocate memory for it
 */
-unsigned int strutil_remove_unicode(const uint8_t *in, const size_t length, char *out) {
+unsigned int strutil_remove_unicode(const uint8_t *in, const size_t length, char **out) {
     unsigned int i;
     unsigned int removeCount = 0;
     char *guess = malloc(sizeof(char) * length);
@@ -109,7 +109,8 @@ unsigned int strutil_remove_unicode(const uint8_t *in, const size_t length, char
         }
     }
     
-    out = strndup(guess, length-removeCount);
+    *out = strndup(guess, length-removeCount);
+    
     free(guess);
     return removeCount;
 }
