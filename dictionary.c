@@ -90,6 +90,14 @@ void td_clean(template_dictionary *in) {
     free(in);
 }
 
+void _td_dump(template_dictionary *td) {
+    template_dictionary_entry *tde = td->entryList;
+    while (tde != NULL) {
+        printf("k: %s\n", tde->key);
+        tde = tde->next;
+    }
+}
+
 template_dictionary *td_merge(template_dictionary *in, template_dictionary *in2) {
     template_dictionary *ret = td_new();
     template_dictionary_entry *curr = in->entryList;
