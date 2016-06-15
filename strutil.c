@@ -5,8 +5,9 @@ Returns a newly allocated string that is the concatenation of the first two.
 */
 char *strutil_append_no_mutate(const char *first, const char *second) {
     int premier = strlen(first);
-    int len = premier + strlen(second);
-    char *ret = calloc(len, sizeof(char));
+    int len = premier + strlen(second) + 1; /* plus null */
+    char *ret = malloc(len * sizeof(char));
+    
     strcpy(ret, first);
     strcpy(&ret[premier], second);
     return ret;
@@ -18,7 +19,7 @@ plus a certain number of characters from the second string.
 */
 char *strutil_appendn_no_mutate(const char *first, const char *second, int count) {
     int premier = strlen(first);
-    int len = premier + count;
+    int len = premier + count + 1; /* plus null */
     char *ret = calloc(len, sizeof(char));
     strcpy(ret, first);
     strncpy(&ret[premier], second, count);

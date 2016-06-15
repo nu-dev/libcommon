@@ -93,24 +93,43 @@ void td_clean(template_dictionary *in) {
 template_dictionary *td_merge(template_dictionary *in, template_dictionary *in2) {
     template_dictionary *ret = td_new();
     template_dictionary_entry *curr = in->entryList;
-    template_dictionary_entry *currcopy;
+    template_dictionary_entry *currcopy = NULL, *temp;
     
     while (curr != NULL) {
-        if (ret->entryList == NULL) {
-            ret->entryList = curr;
-            currcopy = ret->entryList;
+        temp = malloc(sizeof(template_dictionary_entry));
+        /* check if this is the first template_dictionary_entry in the dictionary */
+        if (currcopy == NULL) {
+            currcopy = temp;
+            currcopy->key = curr->key;
+            currcopy->value = curr->value;
+            currcopy->next = NULL;
+            ret->entryList = currcopy;
+        } else {
+            currcopy->next = temp;
+            currcopy = temp;
+            currcopy->key = curr->key;
+            currcopy->value = curr->value;
+            currcopy->next = NULL;
         }
-        curr = curr->next;
-        currcopy->next = curr;
+        /* incr length */
         ret->length++;
+        curr = curr->next;
     }
     
     curr = in2->entryList;
     
     while (curr != NULL) {
-        curr = curr->next;
-        currcopy->next = curr;
+        temp = malloc(sizeof(template_dictionary_entry));
+
+        currcopy->next = temp;
+        currcopy = temp;
+        currcopy->key = curr->key;
+        currcopy->value = curr->value;
+        currcopy->next = NULL;
+        
+        /* incr length */
         ret->length++;
+        curr = curr->next;
     }
     
     ret->entryListTail = currcopy;

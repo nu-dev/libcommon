@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror
+CFLAGS=-Wall -pedantic -static -g
 OBJ=dictionary.o strutil.o
 
 libnucommon.a: libnucommon.a($(OBJ))
