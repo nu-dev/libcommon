@@ -110,8 +110,6 @@ unsigned int strutil_remove_unicode(const uint8_t *in, const size_t length, char
         }
     }
     
-    *out = strndup(guess, length-removeCount);
-    
-    free(guess);
+    *out = guess;
     return removeCount;
 }
