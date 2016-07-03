@@ -1,4 +1,3 @@
-CC=gcc
 CFLAGS=-Wall -pedantic -static -g
 OBJ=dictionary.o strutil.o
 
