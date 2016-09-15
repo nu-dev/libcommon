@@ -20,6 +20,7 @@ typedef struct _template_dictionary {
 } template_dictionary;
 
 const char *td_fetch_val(const template_dictionary *in, const char *lookup);
+const char *td_fetch_val_default(const template_dictionary *in, const char *lookup, const char *default_val);
 template_dictionary *td_new();
 void td_clean(template_dictionary *in);
 template_dictionary *td_merge(template_dictionary *in, template_dictionary *in2);

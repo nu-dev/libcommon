@@ -1,5 +1,8 @@
-CFLAGS=-Wall -pedantic -static -g
+CFLAGS=-Wall -Werror -pedantic -static
 OBJ=dictionary.o strutil.o
+
+debug: CFLAGS += -g -O0
+debug: libnucommon.a
 
 libnucommon.a: libnucommon.a($(OBJ))
 

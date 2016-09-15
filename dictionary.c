@@ -16,6 +16,22 @@ const char *td_fetch_val(const template_dictionary *in, const char *lookup) {
     return NULL;
 }
 
+const char *td_fetch_val_default(const template_dictionary *in, const char *lookup, const char *default_val) {
+    /* get the first entry */
+    template_dictionary_entry *curr = in->entryList;
+    
+    /* loop through the entire list */
+    while (curr != NULL) {
+        /* until the key we're looking for is found */
+        if (strcmp(lookup, curr->key) == 0) {
+            return curr->value;
+        }
+        curr = curr->next;
+    }
+    /* not found */
+    return default_val;
+}
+
 void td_put_val(template_dictionary *in, const char *key, const char *value) {
     /* set up the new template_dictionary_entry to add */
     template_dictionary_entry *toAdd = malloc(sizeof(template_dictionary_entry));
