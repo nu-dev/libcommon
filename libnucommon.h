@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "dictionary.h"
+#include "hashmap.h"
 #include "strutil.h"
 
 /* color codes */
