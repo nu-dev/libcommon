@@ -1,5 +1,5 @@
 CFLAGS=-Wall -Werror -pedantic -static
-OBJ=dictionary.o strutil.o
+OBJ=hashmap.o strutil.o
 
 debug: CFLAGS += -g -O0
 debug: libnucommon.a
