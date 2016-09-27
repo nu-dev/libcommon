@@ -46,6 +46,20 @@ err:
 	return NULL;
 }
 
+/*
+ * Merge two hashmaps. Returns NULL on error.
+ */
+map_t hashmap_merge(map_t a, map_t b) {
+	/* this function uses a terrible hack right now */
+	map_t merging;
+	
+	merging = hashmap_new();
+	hashmap_iterate(a, &hashmap_put, merging);
+	hashmap_iterate(b, &hashmap_put, merging);
+	
+	return merging;
+}
+
 /* The implementation here was originally done by Gary S. Brown.  I have
    borrowed the tables directly, and made some minor changes to the
    crc32-function (including changing the interface). //ylo */
@@ -161,8 +175,8 @@ unsigned long crc32(const unsigned char *s, unsigned int len) {
 /*
  * Hashing function for a string
  */
-unsigned int hashmap_hash_int(hashmap_map * m, char* keystring) {
-    unsigned long key = crc32((unsigned char*)(keystring), strlen(keystring));
+unsigned int hashmap_hash_int(hashmap_map *m, const char *keystring) {
+    unsigned long key = crc32((const unsigned char*)(keystring), strlen(keystring));
 
 	/* Robert Jenkins' 32 bit Mix Function */
 	key += (key << 12);
@@ -184,7 +198,7 @@ unsigned int hashmap_hash_int(hashmap_map * m, char* keystring) {
  * Return the integer of the location in data
  * to store the point to the item, or MAP_FULL.
  */
-int hashmap_hash(map_t in, char* key) {
+int hashmap_hash(map_t in, const char* key) {
 	int curr;
 	int i;
 
@@ -254,7 +268,7 @@ int hashmap_rehash(map_t in) {
 /*
  * Add a pointer to the hashmap with some key
  */
-int hashmap_put(map_t in, char* key, any_t value) {
+int hashmap_put(map_t in, const char* key, any_t value) {
 	int index;
 	hashmap_map* m;
 
@@ -278,7 +292,7 @@ int hashmap_put(map_t in, char* key, any_t value) {
 	
 	/* Set the data */
 	m->data[index].data = value;
-	m->data[index].key = key;
+	m->data[index].key = strdup(key);
 	m->data[index].in_use = 1;
 
 	return MAP_OK;
@@ -287,7 +301,7 @@ int hashmap_put(map_t in, char* key, any_t value) {
 /*
  * Get your pointer out of the hashmap with a key
  */
-int hashmap_get(map_t in, char* key, any_t *arg) {
+int hashmap_get(map_t in, const char* key, any_t *arg) {
 	int curr;
 	int i;
 	hashmap_map* m;
@@ -316,9 +330,9 @@ int hashmap_get(map_t in, char* key, any_t *arg) {
 }
 
 /*
- * Get an element from the hashmap. Returns fresh char pointer.
+ * Get an element from the hashmap. Returns void pointer.
  */
-char *hashmap_get_default(map_t in, char* key, const any_t val_default) {
+any_t hashmap_get_default(map_t in, const char* key, const any_t val_default) {
 	int curr;
 	int i;
 	hashmap_map* m;
@@ -333,14 +347,14 @@ char *hashmap_get_default(map_t in, char* key, const any_t val_default) {
 	for (i = 0; i<MAX_CHAIN_LENGTH; i++) {
 		int in_use = m->data[curr].in_use;
 		if (in_use == 1 && strcmp(m->data[curr].key,key)==0) {
-			return strdup(m->data[curr].data);
+			return (m->data[curr].data);
 		}
 		
 		curr = (curr + 1) % m->table_size;
 	}
 
 	/* Not found */
-	return strdup(val_default);
+	return val_default;
 }
 
 /*
@@ -385,14 +399,15 @@ int hashmap_iterate(map_t in, PFany f, any_t item) {
 	if (hashmap_length(m) <= 0) return MAP_MISSING;	
 
 	/* Linear probing */
-	for (i = 0; i< m->table_size; i++)
+	for (i = 0; i< m->table_size; i++) {
 		if (m->data[i].in_use != 0) {
 			any_t data = (any_t) (m->data[i].data);
-			int status = f(item, data);
-			if (status != MAP_OK)
-				return status;
+			const char *key = (const char *) (m->data[i].key);
+ 			int status = f(item, key, data);
+			if (status != MAP_OK) return status;
 		}
-
+	}
+	
     return MAP_OK;
 }
 
@@ -436,6 +451,28 @@ void hashmap_free(map_t in) {
 	hashmap_map* m = (hashmap_map*) in;
 	free(m->data);
 	free(m);
+}
+
+/* Clean up the hashmap using the given function */
+int hashmap_clean(map_t in, PFsingle f) {
+	int i;
+
+	/* Cast the hashmap */
+	hashmap_map* m = (hashmap_map*) in;
+
+	/* On empty hashmap, return immediately */
+	if (hashmap_length(m) <= 0) return MAP_MISSING;	
+
+	/* Linear probing */
+	for (i = 0; i< m->table_size; i++) {
+		if (m->data[i].in_use != 0) {
+			any_t data = (any_t) (m->data[i].data);
+			free(m->data[i].key);
+			f(data);
+		}
+	}
+
+    return MAP_OK;
 }
 
 /* Return the length of the hashmap */

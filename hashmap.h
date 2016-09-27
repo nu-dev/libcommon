@@ -9,10 +9,11 @@
 #ifndef __HASHMAP_H__
 #define __HASHMAP_H__
 
-#define MAP_MISSING -3  /* No such element */
-#define MAP_FULL -2 	/* Hashmap is full */
-#define MAP_OMEM -1 	/* Out of Memory */
-#define MAP_OK 0 	/* OK */
+#define MAP_MISSING -4  /* No such element */
+#define MAP_FULL -3 	/* Hashmap is full */
+#define MAP_OMEM -2 	/* Out of Memory */
+#define MAP_ERR -1      /* Misc error*/
+#define MAP_OK 0 	    /* OK */
 
 /*
  * any_t is a pointer.  This allows you to put arbitrary structures in
@@ -21,10 +22,15 @@
 typedef void *any_t;
 
 /*
- * PFany is a pointer to a function that can take two any_t arguments
- * and return an integer. Returns status code..
+ * PFany is a pointer to a function that can take two any_t arguments,
+ * a const char and return an integer. Returns status code..
  */
-typedef int (*PFany)(any_t, any_t);
+typedef int (*PFany)(any_t, const char *, any_t);
+
+/*
+ * PFsingle is a pointer to a function that can take a single any_t argument.
+ */
+typedef void (*PFsingle)(any_t);
 
 /*
  * PFserialize is a pointer to a function that can take an any_t argument
@@ -45,6 +51,11 @@ typedef any_t map_t;
 extern map_t hashmap_new();
 
 /*
+ * Merge two hashmaps. Returns NULL on error.
+ */
+extern map_t hashmap_merge(map_t a, map_t b);
+
+/*
  * Iteratively call f with argument (item, data) for
  * each element data in the hashmap. The function must
  * return a map status code. If it returns anything other
@@ -56,17 +67,17 @@ extern int hashmap_iterate(map_t in, PFany f, any_t item);
 /*
  * Add an element to the hashmap. Return MAP_OK or MAP_OMEM.
  */
-extern int hashmap_put(map_t in, char* key, any_t value);
+extern int hashmap_put(map_t in, const char* key, any_t value);
 
 /*
  * Get an element from the hashmap. Return MAP_OK or MAP_MISSING.
  */
-extern int hashmap_get(map_t in, char* key, any_t *arg);
+extern int hashmap_get(map_t in, const char* key, any_t *arg);
 
 /*
  * Get an element from the hashmap. Returns fresh char pointer.
  */
-extern char *hashmap_get_default(map_t in, char* key, const any_t val_default);
+extern any_t hashmap_get_default(map_t in, const char* key, const any_t val_default);
 
 /*
  * Remove an element from the hashmap. Return MAP_OK or MAP_MISSING.
@@ -80,9 +91,14 @@ extern int hashmap_remove(map_t in, char* key);
 extern int hashmap_get_one(map_t in, any_t *arg, int remove);
 
 /*
- * Free the hashmap
+ * Free the hashmap only (not data inside)
  */
 extern void hashmap_free(map_t in);
+
+/*
+ * Clean up the hashmap using the given function
+ */
+extern int hashmap_clean(map_t in, PFsingle f);
 
 /*
  * Get the current size of a hashmap
