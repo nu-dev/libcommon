@@ -8,8 +8,8 @@ char *strutil_append_no_mutate(const char *first, const char *second) {
     int len = premier + strlen(second) + 1; /* plus null */
     char *ret = malloc(len * sizeof(char));
     
-    strcpy(ret, first);
-    strcpy(&ret[premier], second);
+    memcpy(ret, first, premier);
+    memcpy(&ret[premier], second, len-premier); /* copy null */
     return ret;
 }
 
