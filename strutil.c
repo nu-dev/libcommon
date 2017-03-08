@@ -100,7 +100,7 @@ will allocate memory for it
 unsigned int strutil_remove_unicode(const uint8_t *in, const size_t length, char **out) {
     unsigned int i;
     unsigned int removeCount = 0;
-    char *guess = calloc(sizeof(char), length);
+    char *guess = calloc(sizeof(char), length+1);
     
     for (i = 0; i < length; i++) {
         if (in[i] > 127) {
